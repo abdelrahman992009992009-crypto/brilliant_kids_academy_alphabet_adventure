@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brilliant Kids Academy - Interactive Alphabet Adventure</title>
+    <!-- Google Fonts: Fredoka & Quicksand for cute kid-friendly rounded text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for fallback icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandOrange: '#ff9900',
+                        brandGreen: '#2ecc71',
+                        brandPurple: '#9b59b6',
+                        brandBlue: '#3498db',
+                        brandYellow: '#f1c40f',
+                        brandRed: '#e74c3c',
+                        kidsBg: '#FFF9F3'
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'Quicksand', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #FFF5EE 0%, #FFF0F5 50%, #E6F7FF 100%);
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Fun kid-friendly animated background elements */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            animation: floatUp 12s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.3) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2) rotate(360deg); opacity: 0; }
+        }
+
+        /* Card and button standard child-friendly shadow and bounce */
+        .bubbly-btn {
+            box-shadow: 0 8px 0px 0px rgba(0,0,0,0.15);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bubbly-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0px 0px rgba(0,0,0,0.15);
+        }
+
+        /* Custom wiggle animation for cute interactive elements */
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .wiggle-hover:hover {
+            animation: wiggle 0.3s ease-in-out infinite;
+        }
+
+        /* Sparkle & pop effect styles */
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            animation: explode 0.8s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+
+        /* Customized scrollbars for child safety layout */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fff0f5; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff9900; 
+            border-radius: 10px;
+        }
+
+        /* Mascot Widget Sliding/Bouncing Styles */
+        #mascot-container {
+            position: fixed;
+            bottom: -220px;
+            right: 25px;
+            z-index: 40;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        #mascot-container.active {
+            transform: translateY(-240px);
+        }
+        
+        .mascot-bounce {
+            animation: mascotJump 0.6s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+        }
+        @keyframes mascotJump {
+            0% { transform: translateY(0) scaleX(1) scaleY(1); }
+            100% { transform: translateY(-20px) scaleX(0.95) scaleY(1.05); }
+        }
+        
+        /* Mascot Speech Bubble */
+        .speech-bubble {
+            position: absolute;
+            bottom: 125px;
+            right: 20px;
+            background: white;
+            border: 4px solid #ff9900;
+            border-radius: 1.5rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #ff9900;
+            white-space: nowrap;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: scale(0);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 45;
+        }
+        .speech-bubble.active {
+            transform: scale(1);
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 40px;
+            border-width: 15px 15px 0 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+            display: block;
+            width: 0;
+        }
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -21px;
+            right: 38px;
+            border-width: 17px 17px 0 0;
+            border-style: solid;
+            border-color: #ff9900 transparent transparent transparent;
+            display: block;
+            width: 0;
+            z-index: -1;
+        }
+
+        /* Badge Pop Award Animation */
+        @keyframes badgeAward {
+            0% { transform: scale(0.4) rotate(-25deg); opacity: 0; }
+            70% { transform: scale(1.15) rotate(15deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .badge-popup {
+            animation: badgeAward 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center relative py-4 px-2 select-none">
+
+    <!-- Particles, Stars & Rising Balloons overlay -->
+    <canvas id="celebration-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <div id="bubbles-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div class="w-full max-w-5xl bg-white/80 backdrop-blur-md rounded-[3rem] shadow-2xl border-8 border-white p-4 md:p-8 flex flex-col justify-between min-h-[90vh] relative z-10 overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b-4 border-dashed border-orange-200 pb-4 mb-6">
+            <!-- Brilliant Kids Academy Branding -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="goToScreen('home')">
+                <!-- Interactive High-Quality SVG Logo based on Screenshot 2026-06-02 161002.jpg -->
+                <div class="w-16 h-16 bg-white rounded-2xl p-1 shadow-md hover:scale-105 transition-transform duration-300">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                        <!-- Colorful Network Tree Logo -->
+                        <path d="M40 70 L40 55 L48 45 L48 35" stroke="#2ecc71" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path d="M50 70 L50 45 L50 35" stroke="#e74c3c" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path d="M54 70 L54 58 L62 50 L62 35" stroke="#9b59b6" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path d="M66 70 L66 60 L74 52 L74 35" stroke="#3498db" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <line x1="35" y1="70" x2="75" y2="70" stroke="#2ecc71" stroke-width="5" stroke-linecap="round"/>
+                        
+                        <!-- Network branches and colorful round nodes -->
+                        <circle cx="50" cy="22" r="7" fill="#ff9900" />
+                        <circle cx="35" cy="30" r="5" fill="#f1c40f" />
+                        <circle cx="65" cy="28" r="5" fill="#3498db" />
+                        <circle cx="28" cy="45" r="4" fill="#9b59b6" />
+                        <circle cx="78" cy="42" r="4" fill="#ff9900" />
+                        <circle cx="20" cy="55" r="4.5" fill="#3498db" />
+                        <circle cx="82" cy="58" r="4.5" fill="#2ecc71" />
+                        
+                        <!-- Interconnecting grey network lines -->
+                        <path d="M50 22 L35 30 M50 22 L65 28 M35 30 L28 45 M65 28 L78 42 M28 45 L20 55 M78 42 L82 58 M35 30 L50 35 M65 28 L50 35 M28 45 L48 45 M78 42 L62 50" stroke="#95a5a6" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-wide font-fredoka flex items-center gap-1">
+                        Brilliant <span class="text-brandOrange">Kids</span> <span class="text-brandBlue">Academy</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 font-semibold uppercase tracking-widest text-center sm:text-left">Creative Ideas</p>
+                </div>
+            </div>
+
+            <!-- Current Game Status / Back to Menu button -->
+            <div class="flex items-center gap-3">
+                <!-- Sound control -->
+                <button onclick="toggleSound()" id="sound-toggle-btn" class="w-12 h-12 rounded-full bg-brandYellow/20 hover:bg-brandYellow/30 border-2 border-brandYellow text-brandOrange flex items-center justify-center text-xl shadow-sm transition-all">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <button onclick="goToScreen('home')" id="home-nav-btn" class="hidden px-5 py-2.5 rounded-2xl bg-brandPurple text-white font-bold border-b-4 border-purple-800 text-sm hover:brightness-110 active:translate-y-1 bubbly-btn transition-all">
+                    <i class="fas fa-home mr-2"></i> Menu
+                </button>
+            </div>
+        </header>
+
+        <!-- SCREEN 1: HOME / SPLASH SCREEN -->
+        <main id="screen-home" class="flex-grow flex flex-col items-center justify-center text-center py-6">
+            <div class="relative max-w-md mx-auto mb-6">
+                <!-- Large Logo Illustration for Kid Engagement -->
+                <div class="w-40 h-40 mx-auto animate-bounce duration-1000">
+                    <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
+                        <path d="M40 70 L40 55 L48 45 L48 35" stroke="#2ecc71" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M50 70 L50 45 L50 35" stroke="#e74c3c" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M54 70 L54 58 L62 50 L62 35" stroke="#9b59b6" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <path d="M66 70 L66 60 L74 52 L74 35" stroke="#3498db" stroke-width="5" fill="none" stroke-linecap="round"/>
+                        <line x1="30" y1="70" x2="76" y2="70" stroke="#2ecc71" stroke-width="6" stroke-linecap="round"/>
+                        
+                        <circle cx="50" cy="20" r="9" fill="#ff9900" />
+                        <circle cx="32" cy="30" r="7" fill="#f1c40f" />
+                        <circle cx="68" cy="28" r="7" fill="#3498db" />
+                        <circle cx="24" cy="46" r="6.5" fill="#9b59b6" />
+                        <circle cx="78" cy="44" r="6.5" fill="#ff9900" />
+                        <circle cx="16" cy="58" r="6" fill="#3498db" />
+                        <circle cx="84" cy="60" r="6" fill="#2ecc71" />
+                        
+                        <path d="M50 20 L32 30 M50 20 L68 28 M32 30 L24 46 M68 28 L78 44 M24 46 L16 58 M78 44 L84 60 M32 30 L50 35 M68 28 L50 35 M24 46 L48 45 M78 44 L62 50" stroke="#bdc3c7" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </div>
+                <!-- Interactive sparkling stars -->
+                <span class="absolute top-2 left-6 text-brandYellow text-2xl animate-pulse"><i class="fas fa-star"></i></span>
+                <span class="absolute top-12 right-6 text-brandOrange text-3xl animate-pulse delay-75"><i class="fas fa-star"></i></span>
+                <span class="absolute bottom-4 left-10 text-brandBlue text-xl animate-bounce"><i class="fas fa-cloud"></i></span>
+            </div>
+
+            <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 tracking-tight leading-none mb-2">
+                Alphabet <span class="text-brandOrange underline decoration-wavy decoration-brandYellow">Adventure</span>
+            </h2>
+            <p class="text-lg text-slate-500 font-semibold max-w-md mb-8">
+                Welcome to the playground of letters! Let's listen, play, and learn together!
+            </p>
+
+            <!-- Play Mode Selector Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl px-4">
+                <!-- Mode 1: Learn A-Z -->
+                <button onclick="goToScreen('explore')" class="bubbly-btn bg-brandOrange hover:bg-orange-500 text-white p-6 rounded-3xl border-b-8 border-orange-700 flex flex-col items-center justify-center gap-3 transition-transform duration-100 hover:scale-[1.03]">
+                    <span class="text-5xl">🎨</span>
+                    <div>
+                        <h3 class="text-2xl font-black">Alphabet Explorer</h3>
+                        <p class="text-xs font-semibold text-orange-100">Browse and speak letters with picture friends</p>
+                    </div>
+                </button>
+
+                <!-- Mode 2: Match the Letter -->
+                <button onclick="goToScreen('match')" class="bubbly-btn bg-brandGreen hover:bg-green-500 text-white p-6 rounded-3xl border-b-8 border-green-700 flex flex-col items-center justify-center gap-3 transition-transform duration-100 hover:scale-[1.03]">
+                    <span class="text-5xl">🧩</span>
+                    <div>
+                        <h3 class="text-2xl font-black">Match the Letter</h3>
+                        <p class="text-xs font-semibold text-green-100">Find the correct starting letter card</p>
+                    </div>
+                </button>
+
+                <!-- Mode 3: Listen and Tap -->
+                <button onclick="goToScreen('listen')" class="bubbly-btn bg-brandBlue hover:bg-blue-500 text-white p-6 rounded-3xl border-b-8 border-blue-700 flex flex-col items-center justify-center gap-3 transition-transform duration-100 hover:scale-[1.03]">
+                    <span class="text-5xl">👂</span>
+                    <div>
+                        <h3 class="text-2xl font-black">Listen &amp; Tap</h3>
+                        <p class="text-xs font-semibold text-blue-100">Hear the audio voice and tap the right letter</p>
+                    </div>
+                </button>
+
+                <!-- Mode 4: Learn by Category -->
+                <button onclick="goToScreen('category')" class="bubbly-btn bg-brandPurple hover:bg-purple-500 text-white p-6 rounded-3xl border-b-8 border-purple-700 flex flex-col items-center justify-center gap-3 transition-transform duration-100 hover:scale-[1.03]">
+                    <span class="text-5xl">🦁</span>
+                    <div>
+                        <h3 class="text-2xl font-black">Learn by Category</h3>
+                        <p class="text-xs font-semibold text-purple-100">Learn animals, fruits, vegetables &amp; objects</p>
+                    </div>
+                </button>
+            </div>
+        </main>
+
+        <!-- SCREEN 2: ALPHABET EXPLORER -->
+        <main id="screen-explore" class="hidden flex-grow flex flex-col lg:flex-row gap-6 py-2">
+            
+            <!-- Left Grid: A to Z Big Buttons -->
+            <div class="lg:w-7/12 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3 px-2">
+                        <span class="text-lg font-black text-slate-700"><i class="fas fa-play text-brandOrange mr-2"></i>Select a Letter:</span>
+                        <button onclick="playRandomLetter()" class="px-4 py-1.5 bg-brandYellow hover:bg-yellow-500 border-b-4 border-yellow-700 rounded-full font-black text-xs text-slate-800 bubbly-btn transition-all">
+                            🎲 Random Letter
+                        </button>
+                    </div>
+                    <!-- A-Z Grid Container -->
+                    <div id="explorer-grid" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-6 gap-3 p-1">
+                        <!-- Dynamic Alphabet injection -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Detail View Card -->
+            <div class="lg:w-5/12 bg-white rounded-3xl border-4 border-brandOrange/30 p-4 md:p-6 shadow-md flex flex-col justify-between items-center text-center relative overflow-hidden min-h-[450px]">
+                <!-- Decorative colorful border line -->
+                <div class="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-brandOrange via-brandGreen to-brandBlue"></div>
+                
+                <!-- Pronounce Button Inside detail panel -->
+                <div class="w-full flex justify-between items-center">
+                    <span id="letter-speak-indicator" class="text-brandGreen text-sm font-bold opacity-0 transition-opacity flex items-center gap-1">
+                        <span class="animate-ping inline-block w-2.5 h-2.5 rounded-full bg-brandGreen"></span> Speaking...
+                    </span>
+                    <button id="speak-letter-btn" class="text-brandOrange hover:text-orange-600 font-extrabold text-sm flex items-center gap-1.5 px-3 py-1 bg-orange-50 rounded-full transition-colors border border-orange-200">
+                        <i class="fas fa-volume-up animate-pulse"></i> Repeat Sound
+                    </button>
+                </div>
+
+                <!-- Big Main Display of Upper and Lowercase Letter -->
+                <div class="my-4 relative">
+                    <h2 id="detail-letter" class="text-8xl md:text-9xl font-black text-brandOrange select-none animate-bounce drop-shadow-md">Aa</h2>
+                    <p id="detail-phonics" class="text-xl font-bold text-slate-500 mt-1">/æ/ as in Apple</p>
+                </div>
+
+                <!-- Category selector tabs within the letter details to view 4 starting items (Animal, Fruit, Vegetable, Object) -->
+                <div class="w-full">
+                    <p class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Tap matching categories:</p>
+                    <div class="grid grid-cols-4 gap-2 mb-4">
+                        <button onclick="selectCategoryTab('animal')" id="tab-animal" class="tab-btn p-2 rounded-2xl border-2 border-brandGreen text-slate-700 bg-brandGreen/10 flex flex-col items-center gap-1 transition-all">
+                            <span class="text-2xl">🦁</span>
+                            <span class="text-[10px] font-bold">Animal</span>
+                        </button>
+                        <button onclick="selectCategoryTab('fruit')" id="tab-fruit" class="tab-btn p-2 rounded-2xl border-2 border-slate-200 text-slate-700 hover:bg-slate-50 flex flex-col items-center gap-1 transition-all">
+                            <span class="text-2xl">🍎</span>
+                            <span class="text-[10px] font-bold">Fruit</span>
+                        </button>
+                        <button onclick="selectCategoryTab('vegetable')" id="tab-vegetable" class="tab-btn p-2 rounded-2xl border-2 border-slate-200 text-slate-700 hover:bg-slate-50 flex flex-col items-center gap-1 transition-all">
+                            <span class="text-2xl">🥕</span>
+                            <span class="text-[10px] font-bold">Veggie</span>
+                        </button>
+                        <button onclick="selectCategoryTab('object')" id="tab-object" class="tab-btn p-2 rounded-2xl border-2 border-slate-200 text-slate-700 hover:bg-slate-50 flex flex-col items-center gap-1 transition-all">
+                            <span class="text-2xl">🎈</span>
+                            <span class="text-[10px] font-bold">Object</span>
+                        </button>
+                    </div>
+
+                    <!-- Category Detail Content Area -->
+                    <div id="category-showcase" class="bg-slate-50 rounded-2xl p-4 border-2 border-dashed border-slate-200 flex flex-col items-center gap-2 cursor-pointer transition-transform active:scale-95" onclick="speakActiveItem()">
+                        <div id="showcase-visual" class="text-7xl animate-pulse select-none">🍎</div>
+                        <h3 id="showcase-word" class="text-3xl font-black text-brandBlue tracking-wide">Apple</h3>
+                        <p class="text-xs text-brandGreen font-bold flex items-center gap-1"><i class="fas fa-volume-up"></i> Tap to Hear!</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="w-full flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
+                    <button onclick="navigateExplorer(-1)" class="w-12 h-12 bg-brandPurple hover:bg-purple-600 text-white font-extrabold rounded-full bubbly-btn border-b-4 border-purple-800 flex items-center justify-center transition-all">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <span class="text-sm font-bold text-slate-500">Letter index: <span id="current-index-label" class="text-brandOrange font-black">1</span> / 26</span>
+                    <button onclick="navigateExplorer(1)" class="w-12 h-12 bg-brandPurple hover:bg-purple-600 text-white font-extrabold rounded-full bubbly-btn border-b-4 border-purple-800 flex items-center justify-center transition-all">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- SCREEN 3: MATCH THE LETTER GAME -->
+        <main id="screen-match" class="hidden flex-grow flex flex-col items-center justify-center py-2">
+            <div class="w-full max-w-2xl bg-white rounded-3xl border-4 border-brandGreen/30 p-4 md:p-6 shadow-lg text-center relative">
+                <!-- Progress Header -->
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-dashed border-slate-100">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xl">🏆</span>
+                        <span class="font-extrabold text-sm text-slate-600">Score: <span id="match-score" class="text-brandGreen font-black text-lg">0</span></span>
+                    </div>
+                    <span class="text-sm font-bold text-slate-500">Streak: <span id="match-streak" class="text-brandOrange font-black">🔥 0</span></span>
+                    <button onclick="initMatchGame()" class="text-xs font-black text-brandBlue bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                        <i class="fas fa-redo"></i> Skip / Restart
+                    </button>
+                </div>
+
+                <h3 class="text-2xl font-black text-slate-800 mb-4">Can you match this picture to its starting Letter?</h3>
+                
+                <!-- Large Picture Prompt Card -->
+                <div id="match-picture-box" class="w-48 h-48 bg-emerald-50 border-4 border-dashed border-brandGreen rounded-3xl mx-auto flex flex-col items-center justify-center gap-2 mb-6 shadow-inner cursor-pointer hover:scale-105 transition-transform" onclick="speakMatchPrompt()">
+                    <div id="match-target-emoji" class="text-8xl drop-shadow-md select-none animate-bounce">🦁</div>
+                    <div id="match-target-word" class="text-2xl font-extrabold text-slate-700 capitalize tracking-wide">Lion</div>
+                    <span class="text-xs text-brandGreen font-bold flex items-center gap-1"><i class="fas fa-volume-up"></i> Speak Word</span>
+                </div>
+
+                <!-- Answer options cards -->
+                <div id="match-options" class="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                    <!-- Dynamic Answer Letters injected here -->
+                </div>
+
+                <!-- Interactive Feedback Message Board -->
+                <div id="match-feedback" class="mt-6 p-3 rounded-2xl bg-slate-50 border border-slate-200 text-lg font-bold text-slate-500 min-h-[50px] flex items-center justify-center">
+                    Tap the correct letter below to match!
+                </div>
+            </div>
+        </main>
+
+        <!-- SCREEN 4: LISTEN AND TAP GAME -->
+        <main id="screen-listen" class="hidden flex-grow flex flex-col items-center justify-center py-2">
+            <div class="w-full max-w-2xl bg-white rounded-3xl border-4 border-brandBlue/30 p-4 md:p-6 shadow-lg text-center relative">
+                <!-- Progress Header -->
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-dashed border-slate-100">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xl">⭐</span>
+                        <span class="font-extrabold text-sm text-slate-600">Score: <span id="listen-score" class="text-brandBlue font-black text-lg">0</span></span>
+                    </div>
+                    <button onclick="speakListenPrompt()" class="px-4 py-2 bg-brandYellow hover:bg-yellow-500 border-b-4 border-yellow-700 text-slate-800 rounded-full font-black text-xs bubbly-btn transition-all flex items-center gap-1.5">
+                        <i class="fas fa-volume-up animate-pulse"></i> Hear Again!
+                    </button>
+                    <button onclick="initListenGame()" class="text-xs font-black text-brandOrange bg-orange-50 px-3 py-1 rounded-full border border-orange-200">
+                        <i class="fas fa-redo"></i> Skip / Next
+                    </button>
+                </div>
+
+                <h3 class="text-2xl font-black text-slate-800 mb-6">Listen to the voice and tap the right letter!</h3>
+
+                <!-- Big Speaker/Sound waves graphic -->
+                <div onclick="speakListenPrompt()" class="w-32 h-32 mx-auto bg-blue-50 hover:bg-blue-100 rounded-full border-4 border-brandBlue flex items-center justify-center text-5xl text-brandBlue shadow-md mb-8 cursor-pointer transform hover:scale-105 transition-all">
+                    <i class="fas fa-bullhorn animate-bounce"></i>
+                </div>
+
+                <!-- Answer options cards -->
+                <div id="listen-options" class="grid grid-cols-4 gap-4 max-w-lg mx-auto mb-6">
+                    <!-- Dynamic letters injected here -->
+                </div>
+
+                <!-- Interactive Feedback Message Board -->
+                <div id="listen-feedback" class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-lg font-bold text-slate-500 min-h-[50px] flex items-center justify-center">
+                    Tap the green horn above to listen!
+                </div>
+            </div>
+        </main>
+
+        <!-- SCREEN 5: LEARN BY CATEGORY -->
+        <main id="screen-category" class="hidden flex-grow flex flex-col py-2">
+            <!-- Category Navigation Header -->
+            <div class="flex flex-wrap justify-center gap-3 mb-6">
+                <button onclick="switchCategoryGroup('animal')" id="catgroup-animal" class="catgroup-btn px-6 py-3 rounded-2xl border-b-4 border-emerald-800 bg-brandGreen text-white font-extrabold flex items-center gap-2 bubbly-btn">
+                    <span>🦁</span> Animals
+                </button>
+                <button onclick="switchCategoryGroup('fruit')" id="catgroup-fruit" class="catgroup-btn px-6 py-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-extrabold flex items-center gap-2 hover:bg-slate-50">
+                    <span>🍎</span> Fruits
+                </button>
+                <button onclick="switchCategoryGroup('vegetable')" id="catgroup-vegetable" class="catgroup-btn px-6 py-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-extrabold flex items-center gap-2 hover:bg-slate-50">
+                    <span>🥕</span> Vegetables
+                </button>
+                <button onclick="switchCategoryGroup('object')" id="catgroup-object" class="catgroup-btn px-6 py-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-extrabold flex items-center gap-2 hover:bg-slate-50">
+                    <span>🎈</span> Objects
+                </button>
+            </div>
+
+            <!-- Scrollable Grid Showcase -->
+            <div class="flex-grow bg-slate-50 rounded-3xl border-4 border-dashed border-slate-200 p-4 md:p-6 overflow-y-auto max-h-[480px]">
+                <div id="category-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Dynamic injection of items starting with letters A-Z -->
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER / SCREEN CONTROL -->
+        <footer class="mt-6 pt-4 border-t-4 border-dashed border-orange-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Created for</span>
+                <span class="text-sm font-black text-slate-600">Brilliant Kids Academy (Creative Ideas)</span>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="openHelpModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-xs border border-slate-300">
+                    ❓ Parents Guide
+                </button>
+                <p class="text-xs text-slate-400 font-bold flex items-center">
+                    Made with <span class="text-brandRed mx-1 text-sm">❤️</span> for bright minds
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 border-8 border-brandYellow shadow-2xl relative">
+            <button onclick="closeHelpModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-brandRed text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md hover:scale-105 transition-transform">
+                &times;
+            </button>
+            <h3 class="text-2xl font-black text-brandOrange mb-4 flex items-center gap-2">
+                🎓 Teachers &amp; Parents Guide
+            </h3>
+            <div class="space-y-4 text-slate-600 text-sm">
+                <p>
+                    Welcome to <strong>Brilliant Kids Academy's</strong> interactive alphabet adventure! Here's how to play and practice:
+                </p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Alphabet Explorer:</strong> Let your child tap letters. Choose tabs to toggle matching categories. Tap cards to repeat speech.</li>
+                    <li><strong>Match the Letter:</strong> A multiple-choice quiz designed to strengthen phonics and alphabet sound connections.</li>
+                    <li><strong>Listen &amp; Tap:</strong> Tests sound recognition. Listen to the letter voice then tap the appropriate alphabet card.</li>
+                    <li><strong>Learn by Category:</strong> Filters words by cute groups to enrich child's early vocabulary.</li>
+                </ul>
+                <div class="p-3 bg-yellow-50 border-2 border-dashed border-brandYellow rounded-2xl">
+                    <p class="text-xs font-bold text-amber-800">
+                        💡 Tip: Make sure your system's text-to-speech volume is turned up to hear correct pronunciations!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MASCOT CONTAINER (Reaction Node) -->
+    <div id="mascot-container" class="flex flex-col items-center">
+        <!-- Speech Bubble with dynamic phrase feedback -->
+        <div id="mascot-bubble" class="speech-bubble font-fredoka font-black">Great Job!</div>
+        
+        <!-- Animated Mascot - Styled dynamically using SVG representing the Brilliant Kids Academy Node Tree -->
+        <div class="w-32 h-32 mascot-bounce">
+            <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-md">
+                <!-- Base branch and main connector node roots -->
+                <path d="M60 110 L60 80 M52 95 L60 80 M68 95 L60 80" stroke="#8b5a2b" stroke-width="8" stroke-linecap="round"/>
+                
+                <!-- Main central Tree body (Green Face) -->
+                <circle cx="60" cy="55" r="35" fill="#2ecc71" />
+                
+                <!-- Secondary beautiful colored dot connections matching brand logo -->
+                <circle cx="35" cy="40" r="12" fill="#ff9900" />
+                <circle cx="85" cy="40" r="12" fill="#3498db" />
+                <circle cx="45" cy="80" r="10" fill="#9b59b6" />
+                <circle cx="75" cy="80" r="10" fill="#f1c40f" />
+                <circle cx="60" cy="22" r="14" fill="#e74c3c" />
+
+                <!-- Connecting white network lines -->
+                <line x1="60" y1="55" x2="35" y2="40" stroke="white" stroke-width="2" />
+                <line x1="60" y1="55" x2="85" y2="40" stroke="white" stroke-width="2" />
+                <line x1="60" y1="55" x2="45" y2="80" stroke="white" stroke-width="2" />
+                <line x1="60" y1="55" x2="75" y2="80" stroke="white" stroke-width="2" />
+                <line x1="60" y1="55" x2="60" y2="22" stroke="white" stroke-width="2" />
+
+                <!-- Cute Baby Eyes & Smile -->
+                <!-- Whites of eyes -->
+                <circle cx="50" cy="50" r="5" fill="white" />
+                <circle cx="70" cy="50" r="5" fill="white" />
+                <!-- Active pupil dots -->
+                <circle cx="51" cy="50" r="2.5" fill="#1a1a1a" />
+                <circle cx="69" cy="50" r="2.5" fill="#1a1a1a" />
+                <!-- Chubby rosy cheeks -->
+                <circle cx="42" cy="58" r="4.5" fill="#ff7f7f" opacity="0.8"/>
+                <circle cx="78" cy="58" r="4.5" fill="#ff7f7f" opacity="0.8"/>
+                <!-- Cheerful baby smile curve -->
+                <path d="M53 58 Q60 66 67 58" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- STREAK ACHIEVEMENT BADGE AWARD MODAL -->
+    <div id="badge-modal" class="hidden fixed inset-0 bg-black/65 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 border-8 border-brandYellow shadow-2xl text-center badge-popup relative">
+            <button onclick="closeBadgeModal()" class="absolute top-4 right-4 w-10 h-10 bg-brandRed text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md hover:scale-105 transition-transform">
+                &times;
+            </button>
+            <div class="w-36 h-36 mx-auto mb-6 relative">
+                <!-- Golden Award Medal Visual -->
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl animate-bounce">
+                    <!-- Shiny Badge Ribbons -->
+                    <path d="M35 55 L35 90 L50 80 L65 90 L65 55 Z" fill="#e74c3c" />
+                    <path d="M42 55 L42 85 L50 78 L58 85 L58 55 Z" fill="#c0392b" />
+                    <!-- Medal Rim -->
+                    <circle cx="50" cy="45" r="35" fill="#f1c40f" stroke="#f39c12" stroke-width="4"/>
+                    <circle cx="50" cy="45" r="28" fill="#f39c12" />
+                    <!-- Star inside medal -->
+                    <path d="M50 25 L55 35 L67 37 L58 45 L61 57 L50 50 L39 57 L42 45 L33 37 L45 35 Z" fill="#fff" />
+                </svg>
+                <!-- Academic Graduation cap overlay icon -->
+                <span class="absolute -bottom-2 right-4 text-4xl animate-pulse">🎓</span>
+            </div>
+            
+            <h4 class="text-xs uppercase tracking-widest font-black text-brandOrange mb-1">New Achievement Unlocked!</h4>
+            <h3 id="badge-title" class="text-3xl font-black text-slate-800 mb-2">Amazing Explorer</h3>
+            <p id="badge-desc" class="text-sm font-semibold text-slate-500 mb-6">You got a 3-win correct streak! Keep going!</p>
+            
+            <button onclick="closeBadgeModal()" class="w-full py-4 bg-brandGreen hover:bg-green-500 text-white font-black rounded-2xl border-b-8 border-green-700 bubbly-btn text-lg transition-transform hover:scale-105">
+                Awesome! Let's Play!
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Core Letter Database (A to Z) mapped correctly to 4 categories: Animal, Fruit, Vegetable, Object
+        const alphabetDB = [
+            {
+                letter: 'A',
+                phonics: '/æ/ as in Apple',
+                animal: { name: 'Alligator', emoji: '🐊' },
+                fruit: { name: 'Apple', emoji: '🍎' },
+                vegetable: { name: 'Asparagus', emoji: '🥬' },
+                object: { name: 'Airplane', emoji: '✈️' }
+            },
+            {
+                letter: 'B',
+                phonics: '/b/ as in Bear',
+                animal: { name: 'Bear', emoji: '🐻' },
+                fruit: { name: 'Banana', emoji: '🍌' },
+                vegetable: { name: 'Broccoli', emoji: '🥦' },
+                object: { name: 'Balloon', emoji: '🎈' }
+            },
+            {
+                letter: 'C',
+                phonics: '/k/ as in Cat',
+                animal: { name: 'Cat', emoji: '🐱' },
+                fruit: { name: 'Cherry', emoji: '🍒' },
+                vegetable: { name: 'Carrot', emoji: '🥕' },
+                object: { name: 'Car', emoji: '🚗' }
+            },
+            {
+                letter: 'D',
+                phonics: '/d/ as in Dog',
+                animal: { name: 'Dog', emoji: '🐶' },
+                fruit: { name: 'Date', emoji: '🌴' },
+                vegetable: { name: 'Dill', emoji: '🌿' },
+                object: { name: 'Drum', emoji: '🥁' }
+            },
+            {
+                letter: 'E',
+                phonics: '/ɛ/ as in Elephant',
+                animal: { name: 'Elephant', emoji: '🐘' },
+                fruit: { name: 'Elderberry', emoji: '🍇' },
+                vegetable: { name: 'Eggplant', emoji: '🍆' },
+                object: { name: 'Envelope', emoji: '✉️' }
+            },
+            {
+                letter: 'F',
+                phonics: '/f/ as in Fox',
+                animal: { name: 'Fox', emoji: '🦊' },
+                fruit: { name: 'Fig', emoji: '🍈' },
+                vegetable: { name: 'Fennel', emoji: '🌿' },
+                object: { name: 'Fan', emoji: '🪭' }
+            },
+            {
+                letter: 'G',
+                phonics: '/g/ as in Giraffe',
+                animal: { name: 'Giraffe', emoji: '🦒' },
+                fruit: { name: 'Grape', emoji: '🍇' },
+                vegetable: { name: 'Garlic', emoji: '🧄' },
+                object: { name: 'Guitar', emoji: '🎸' }
+            },
+            {
+                letter: 'H',
+                phonics: '/h/ as in Horse',
+                animal: { name: 'Horse', emoji: '🐴' },
+                fruit: { name: 'Honeydew', emoji: '🍈' },
+                vegetable: { name: 'Herb', emoji: '🌱' },
+                object: { name: 'House', emoji: '🏠' }
+            },
+            {
+                letter: 'I',
+                phonics: '/ɪ/ as in Iguana',
+                animal: { name: 'Iguana', emoji: '🦎' },
+                fruit: { name: 'Ice-apple', emoji: '🍍' },
+                vegetable: { name: 'Ivy-gourd', emoji: '🥒' },
+                object: { name: 'Ice Cream', emoji: '🍦' }
+            },
+            {
+                letter: 'J',
+                phonics: '/dʒ/ as in Jellyfish',
+                animal: { name: 'Jellyfish', emoji: '🪼' },
+                fruit: { name: 'Jackfruit', emoji: '🍍' },
+                vegetable: { name: 'Jicama', emoji: '🥔' },
+                object: { name: 'Jeep', emoji: '🚙' }
+            },
+            {
+                letter: 'K',
+                phonics: '/k/ as in Kangaroo',
+                animal: { name: 'Kangaroo', emoji: '🦘' },
+                fruit: { name: 'Kiwi', emoji: '🥝' },
+                vegetable: { name: 'Kale', emoji: '🥬' },
+                object: { name: 'Kite', emoji: '🪁' }
+            },
+            {
+                letter: 'L',
+                phonics: '/l/ as in Lion',
+                animal: { name: 'Lion', emoji: '🦁' },
+                fruit: { name: 'Lemon', emoji: '🍋' },
+                vegetable: { name: 'Lettuce', emoji: '🥬' },
+                object: { name: 'Lamp', emoji: '💡' }
+            },
+            {
+                letter: 'M',
+                phonics: '/m/ as in Monkey',
+                animal: { name: 'Monkey', emoji: '🐵' },
+                fruit: { name: 'Mango', emoji: '🥭' },
+                vegetable: { name: 'Mushroom', emoji: '🍄' },
+                object: { name: 'Mug', emoji: '🥛' }
+            },
+            {
+                letter: 'N',
+                phonics: '/n/ as in Nest',
+                animal: { name: 'Newt', emoji: '🦎' },
+                fruit: { name: 'Nectarine', emoji: '🍑' },
+                vegetable: { name: 'Nappa', emoji: '🥬' },
+                object: { name: 'Net', emoji: '🕸️' }
+            },
+            {
+                letter: 'O',
+                phonics: '/ɒ/ as in Owl',
+                animal: { name: 'Owl', emoji: '🦉' },
+                fruit: { name: 'Orange', emoji: '🍊' },
+                vegetable: { name: 'Onion', emoji: '🧅' },
+                object: { name: 'Ocean', emoji: '🌊' }
+            },
+            {
+                letter: 'P',
+                phonics: '/p/ as in Panda',
+                animal: { name: 'Panda', emoji: '🐼' },
+                fruit: { name: 'Peach', emoji: '🍑' },
+                vegetable: { name: 'Pea', emoji: '🫛' },
+                object: { name: 'Pencil', emoji: '✏️' }
+            },
+            {
+                letter: 'Q',
+                phonics: '/kw/ as in Quail',
+                animal: { name: 'Quail', emoji: '🐦' },
+                fruit: { name: 'Quince', emoji: '🍏' },
+                vegetable: { name: 'Quandong', emoji: '🍒' },
+                object: { name: 'Queen', emoji: '👑' }
+            },
+            {
+                letter: 'R',
+                phonics: '/r/ as in Rabbit',
+                animal: { name: 'Rabbit', emoji: '🐰' },
+                fruit: { name: 'Raspberry', emoji: '🍓' },
+                vegetable: { name: 'Radish', emoji: '🥕' },
+                object: { name: 'Ring', emoji: '💍' }
+            },
+            {
+                letter: 'S',
+                phonics: '/s/ as in Sheep',
+                animal: { name: 'Sheep', emoji: '🐑' },
+                fruit: { name: 'Strawberry', emoji: '🍓' },
+                vegetable: { name: 'Spinach', emoji: '🥬' },
+                object: { name: 'Sun', emoji: '☀️' }
+            },
+            {
+                letter: 'T',
+                phonics: '/t/ as in Tiger',
+                animal: { name: 'Tiger', emoji: '🐯' },
+                fruit: { name: 'Tangerine', emoji: '🍊' },
+                vegetable: { name: 'Tomato', emoji: '🍅' },
+                object: { name: 'Train', emoji: '🚂' }
+            },
+            {
+                letter: 'U',
+                phonics: '/ʌ/ as in Unicorn',
+                animal: { name: 'Unicorn', emoji: '🦄' },
+                fruit: { name: 'Ugli Fruit', emoji: '🍊' },
+                vegetable: { name: 'Ulluco', emoji: '🥔' },
+                object: { name: 'Umbrella', emoji: '☂️' }
+            },
+            {
+                letter: 'V',
+                phonics: '/v/ as in Vulture',
+                animal: { name: 'Vulture', emoji: '🦅' },
+                fruit: { name: 'Velvet Apple', emoji: '🍎' },
+                vegetable: { name: 'Vine Spinach', emoji: '🥬' },
+                object: { name: 'Violin', emoji: '🎻' }
+            },
+            {
+                letter: 'W',
+                phonics: '/w/ as in Whale',
+                animal: { name: 'Whale', emoji: '🐳' },
+                fruit: { name: 'Watermelon', emoji: '🍉' },
+                vegetable: { name: 'Watercress', emoji: '🥬' },
+                object: { name: 'Watch', emoji: '⌚' }
+            },
+            {
+                letter: 'X',
+                phonics: '/ks/ as in Xylophone',
+                animal: { name: 'X-ray Fish', emoji: '🐟' },
+                fruit: { name: 'Ximenia', emoji: '🍒' },
+                vegetable: { name: 'Xie-lan', emoji: '🥦' },
+                object: { name: 'Xylophone', emoji: '🪵' }
+            },
+            {
+                letter: 'Y',
+                phonics: '/j/ as in Yak',
+                animal: { name: 'Yak', emoji: '🐂' },
+                fruit: { name: 'Yuzu', emoji: '🍋' },
+                vegetable: { name: 'Yam', emoji: '🍠' },
+                object: { name: 'Yo-yo', emoji: '🪀' }
+            },
+            {
+                letter: 'Z',
+                phonics: '/z/ as in Zebra',
+                animal: { name: 'Zebra', emoji: '🦓' },
+                fruit: { name: 'Zinfandel', emoji: '🍇' },
+                vegetable: { name: 'Zucchini', emoji: '🥒' },
+                object: { name: 'Zipper', emoji: '🤐' }
+            }
+        ];
+
+        // Game / App Global State
+        let currentScreen = 'home';
+        let currentExplorerIndex = 0; // Starts at 'A'
+        let currentCategoryTab = 'animal'; // animal, fruit, vegetable, object
+        let soundEnabled = true;
+
+        // Mini-game stats
+        let matchScore = 0;
+        let matchStreak = 0;
+        let matchTargetLetter = '';
+        let matchCorrectObject = null;
+
+        let listenScore = 0;
+        let listenStreak = 0; // Added streak tracking for the sound quiz game
+        let listenTargetLetter = '';
+
+        // Category Group filter state
+        let activeCategoryGroup = 'animal';
+
+        // WEB AUDIO API SYNTHESIZER FOR SOUND EFFECTS
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSynthSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'pop') {
+                    // Quick bubble pop sound
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'success') {
+                    // Playful nursery triumph chord
+                    const now = audioCtx.currentTime;
+                    // Note C5
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start();
+                    osc.stop(now + 0.4);
+
+                    // Note E5 shortly after
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(659.25, now + 0.1);
+                    gain2.gain.setValueAtTime(0.15, now + 0.1);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc2.start();
+                    osc2.stop(now + 0.5);
+
+                    // Note G5
+                    const osc3 = audioCtx.createOscillator();
+                    const gain3 = audioCtx.createGain();
+                    osc3.connect(gain3);
+                    gain3.connect(audioCtx.destination);
+                    osc3.type = 'triangle';
+                    osc3.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain3.gain.setValueAtTime(0.15, now + 0.2);
+                    gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc3.start();
+                    osc3.stop(now + 0.6);
+                } else if (type === 'badge_fanfare') {
+                    // Major chord progression sweeping upward for badge awards!
+                    const now = audioCtx.currentTime;
+                    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.type = 'triangle';
+                        o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        g.gain.setValueAtTime(0.15, now + idx * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.1 + 0.6);
+                        o.start(now + idx * 0.1);
+                        o.stop(now + idx * 0.1 + 0.6);
+                    });
+                } else if (type === 'fail') {
+                    // Sad boing/buzz
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(80, audioCtx.currentTime + 0.4);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.log('Audio Context Error:', e);
+            }
+        }
+
+        // HIGH QUALITY TTS SPEECH SYNTHESIS ENGINE
+        function speakWord(text, pitch = 1.3, rate = 0.85) {
+            if (!soundEnabled) return;
+            
+            // Cancel any ongoing speeches
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.pitch = pitch; // Nursery voice pitch
+            utterance.rate = rate;   // Slow and clear
+
+            // Find a high quality English voice if possible
+            const voices = window.speechSynthesis.getVoices();
+            const childVoice = voices.find(voice => 
+                voice.lang.startsWith('en') && 
+                (voice.name.includes('Google') || voice.name.includes('Natural') || voice.name.includes('Zira') || voice.name.includes('Samantha'))
+            );
+            if (childVoice) {
+                utterance.voice = childVoice;
+            }
+
+            // Speech indicator animation triggers
+            const indicator = document.getElementById('letter-speak-indicator');
+            utterance.onstart = () => {
+                if (indicator) indicator.style.opacity = '1';
+            };
+            utterance.onend = () => {
+                if (indicator) indicator.style.opacity = '0';
+            };
+            utterance.onerror = () => {
+                if (indicator) indicator.style.opacity = '0';
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Particle Spawner for correct matches (HTML Element based fallback)
+        function createExplosion(x, y, color) {
+            const container = document.getElementById('bubbles-container');
+            if (!container) return;
+
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'absolute pointer-events-none rounded-full sparkle';
+                const size = Math.random() * 16 + 8;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+
+                // Random path vectors
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 120 + 30;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                particle.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 600 + Math.random() * 400,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)',
+                    fill: 'forwards'
+                });
+
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // Generate drifting background floating shapes
+        function initDecorativeBubbles() {
+            const container = document.getElementById('bubbles-container');
+            const colors = ['#ff9900', '#2ecc71', '#9b59b6', '#3498db', '#f1c40f', '#e74c3c'];
+            setInterval(() => {
+                if (document.hidden) return;
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 40 + 15;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                bubble.style.opacity = '0.15';
+                container.appendChild(bubble);
+                setTimeout(() => bubble.remove(), 12000);
+            }, 1500);
+        }
+
+        // Screen Switcher
+        function goToScreen(screenId) {
+            playSynthSound('pop');
+            
+            // Hide all screen contents
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-explore').classList.add('hidden');
+            document.getElementById('screen-match').classList.add('hidden');
+            document.getElementById('screen-listen').classList.add('hidden');
+            document.getElementById('screen-category').classList.add('hidden');
+
+            // Show target
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+            currentScreen = screenId;
+
+            // Show/Hide top Home navigation button
+            const homeBtn = document.getElementById('home-nav-btn');
+            if (screenId === 'home') {
+                homeBtn.classList.add('hidden');
+            } else {
+                homeBtn.classList.remove('hidden');
+            }
+
+            // Screen Specific Initializers
+            if (screenId === 'explore') {
+                initAlphabetExplorer();
+            } else if (screenId === 'match') {
+                initMatchGame();
+            } else if (screenId === 'listen') {
+                initListenGame();
+            } else if (screenId === 'category') {
+                initCategoryViewer();
+            }
+        }
+
+        // Toggle Sound State
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('sound-toggle-btn');
+            if (soundEnabled) {
+                btn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                btn.className = "w-12 h-12 rounded-full bg-brandYellow/20 hover:bg-brandYellow/30 border-2 border-brandYellow text-brandOrange flex items-center justify-center text-xl shadow-sm transition-all";
+                playSynthSound('pop');
+            } else {
+                btn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                btn.className = "w-12 h-12 rounded-full bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-slate-400 flex items-center justify-center text-xl shadow-sm transition-all";
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        // ALPHABET EXPLORER ENGINE
+        function initAlphabetExplorer() {
+            const gridContainer = document.getElementById('explorer-grid');
+            gridContainer.innerHTML = '';
+
+            const colors = ['bg-brandOrange', 'bg-brandGreen', 'bg-brandPurple', 'bg-brandBlue', 'bg-brandYellow', 'bg-brandRed'];
+
+            alphabetDB.forEach((item, index) => {
+                const button = document.createElement('button');
+                const isSelected = index === currentExplorerIndex;
+                const itemColor = colors[index % colors.length];
+
+                button.className = `bubbly-btn h-14 text-2xl font-black rounded-2xl flex items-center justify-center transition-all transform hover:scale-105 ${
+                    isSelected 
+                        ? `${itemColor} text-white ring-4 ring-offset-2 ring-slate-400 border-b-4 border-black/30` 
+                        : 'bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-200'
+                }`;
+
+                button.innerHTML = `${item.letter}<span class="text-xs ml-0.5 font-bold opacity-75">${item.letter.toLowerCase()}</span>`;
+                button.onclick = (e) => {
+                    selectExplorerLetter(index);
+                    createExplosion(e.clientX, e.clientY, '#ff9900');
+                };
+                gridContainer.appendChild(button);
+            });
+
+            updateExplorerDetails();
+        }
+
+        function selectExplorerLetter(index) {
+            currentExplorerIndex = index;
+            playSynthSound('pop');
+            initAlphabetExplorer(); // redraw grid to update select ring
+        }
+
+        function playRandomLetter() {
+            const randIndex = Math.floor(Math.random() * 26);
+            selectExplorerLetter(randIndex);
+        }
+
+        function updateExplorerDetails() {
+            const item = alphabetDB[currentExplorerIndex];
+            
+            // Set big letters
+            const detailLetter = document.getElementById('detail-letter');
+            detailLetter.textContent = `${item.letter}${item.letter.toLowerCase()}`;
+            
+            // Set phonics guide
+            document.getElementById('detail-phonics').textContent = item.phonics;
+            document.getElementById('current-index-label').textContent = currentExplorerIndex + 1;
+
+            // Update Tab Content based on active category
+            selectCategoryTab(currentCategoryTab);
+
+            // Automatic pronunciation when letter loads
+            speakCurrentLetterPhonics();
+        }
+
+        function speakCurrentLetterPhonics() {
+            const item = alphabetDB[currentExplorerIndex];
+            const letterSound = item.letter;
+            // E.g., "A, A says Apple!"
+            const defaultWord = item[currentCategoryTab].name;
+            speakWord(`${letterSound}! ${letterSound} is for ${defaultWord}`);
+        }
+
+        // Audio controls on Explorer
+        document.getElementById('speak-letter-btn').onclick = () => {
+            speakCurrentLetterPhonics();
+        };
+
+        function selectCategoryTab(category) {
+            currentCategoryTab = category;
+            
+            // Deactivate all tab borders
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn p-2 rounded-2xl border-2 border-slate-200 text-slate-700 hover:bg-slate-50 flex flex-col items-center gap-1 transition-all";
+            });
+
+            // Activate chosen tab
+            const activeColors = {
+                animal: 'border-brandGreen bg-brandGreen/10',
+                fruit: 'border-brandOrange bg-brandOrange/10',
+                vegetable: 'border-brandYellow bg-brandYellow/10',
+                object: 'border-brandBlue bg-brandBlue/10'
+            };
+            document.getElementById(`tab-${category}`).className = `tab-btn p-2 rounded-2xl border-2 ${activeColors[category]} text-slate-700 flex flex-col items-center gap-1 transition-all`;
+
+            // Update details shown inside the showcase card
+            const letterItem = alphabetDB[currentExplorerIndex];
+            const activeData = letterItem[category];
+
+            document.getElementById('showcase-visual').textContent = activeData.emoji;
+            document.getElementById('showcase-word').textContent = activeData.name;
+
+            // Speak category object
+            speakWord(activeData.name);
+        }
+
+        function speakActiveItem() {
+            const letterItem = alphabetDB[currentExplorerIndex];
+            const activeData = letterItem[currentCategoryTab];
+            speakWord(activeData.name);
+        }
+
+        function navigateExplorer(direction) {
+            let nextIndex = currentExplorerIndex + direction;
+            if (nextIndex < 0) nextIndex = 25;
+            if (nextIndex > 25) nextIndex = 0;
+            selectExplorerLetter(nextIndex);
+        }
+
+        // CATEGORY EXPLORER ENGINE
+        function initCategoryViewer() {
+            switchCategoryGroup(activeCategoryGroup);
+        }
+
+        function switchCategoryGroup(groupName) {
+            activeCategoryGroup = groupName;
+            
+            // Toggle active style on category selection buttons
+            document.querySelectorAll('.catgroup-btn').forEach(btn => {
+                btn.className = "catgroup-btn px-6 py-3 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-extrabold flex items-center gap-2 hover:bg-slate-50 transition-all";
+            });
+
+            const activeStyles = {
+                animal: 'border-b-4 border-emerald-800 bg-brandGreen text-white',
+                fruit: 'border-b-4 border-orange-800 bg-brandOrange text-white',
+                vegetable: 'border-b-4 border-yellow-800 bg-brandYellow text-slate-800',
+                object: 'border-b-4 border-blue-800 bg-brandBlue text-white'
+            };
+
+            const activeBtn = document.getElementById(`catgroup-${groupName}`);
+            if (activeBtn) {
+                activeBtn.className = `catgroup-btn px-6 py-3 rounded-2xl ${activeStyles[groupName]} font-extrabold flex items-center gap-2 bubbly-btn transition-all`;
+            }
+
+            renderCategoryGrid(groupName);
+        }
+
+        function renderCategoryGrid(groupName) {
+            const grid = document.getElementById('category-grid');
+            grid.innerHTML = '';
+
+            const colors = {
+                animal: 'border-brandGreen bg-emerald-50 hover:bg-emerald-100 text-slate-700',
+                fruit: 'border-brandOrange bg-orange-50 hover:bg-orange-100 text-slate-700',
+                vegetable: 'border-brandYellow bg-yellow-50 hover:bg-yellow-100 text-slate-700',
+                object: 'border-brandBlue bg-blue-50 hover:bg-blue-100 text-slate-700'
+            };
+
+            alphabetDB.forEach(item => {
+                const categoryData = item[groupName];
+                const card = document.createElement('div');
+                card.className = `bubbly-btn p-4 rounded-2xl border-2 ${colors[groupName]} flex flex-col items-center gap-2 text-center cursor-pointer transition-all hover:-translate-y-1`;
+                
+                card.innerHTML = `
+                    <div class="text-4xl select-none">${categoryData.emoji}</div>
+                    <div class="text-base font-extrabold capitalize leading-tight">${categoryData.name}</div>
+                    <div class="px-2 py-0.5 bg-white/60 border border-slate-200 rounded-full text-[10px] font-bold">Starts with ${item.letter}</div>
+                `;
+
+                card.onclick = (e) => {
+                    createExplosion(e.clientX, e.clientY, '#9b59b6');
+                    playSynthSound('pop');
+                    speakWord(`${categoryData.name}, starts with letter ${item.letter}`);
+                };
+
+                grid.appendChild(card);
+            });
+        }
+
+        // MODAL MANAGEMENT
+        function openHelpModal() {
+            document.getElementById('help-modal').classList.remove('hidden');
+            playSynthSound('pop');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('help-modal').classList.add('hidden');
+            playSynthSound('pop');
+        }
+
+
+        const canvas = document.getElementById('celebration-canvas');
+        const ctx = canvas.getContext('2d');
+        let celebrationActive = false;
+        let particles = [];
+        let stars = [];
+        let balloons = [];
+        let animationFrameId = null;
+
+        const celebrationColors = ['#ff9900', '#2ecc71', '#9b59b6', '#3498db', '#f1c40f', '#e74c3c'];
+        const successPhrases = ["Great Job!", "Excellent!", "Awesome!", "Well Done!", "You Did It!"];
+
+        function resizeCelebrationCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCelebrationCanvas);
+        resizeCelebrationCanvas();
+
+        // 1. Confetti Particle Class
+        class ConfettiParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -100 - 10;
+                this.size = Math.random() * 10 + 8;
+                this.color = celebrationColors[Math.floor(Math.random() * celebrationColors.length)];
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 3 + 2;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 8 - 4;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.rotation += this.rotationSpeed;
+            }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        // 2. Star Particle Class
+        class StarParticle {
+            constructor(x, y) {
+                this.x = x || canvas.width / 2;
+                this.y = y || canvas.height / 2;
+                this.size = Math.random() * 14 + 10;
+                this.color = '#f1c40f'; // Bright celebration gold star
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 7 + 4;
+                this.speedX = Math.cos(angle) * speed;
+                this.speedY = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += 0.08; // light gravity drift
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                // Draw 5-point star
+                const spikes = 5;
+                const outerRadius = this.size;
+                const innerRadius = this.size / 2;
+                let rot = Math.PI / 2 * 3;
+                let step = Math.PI / spikes;
+                ctx.moveTo(this.x, this.y - outerRadius);
+                for (let i = 0; i < spikes; i++) {
+                    ctx.lineTo(this.x + Math.cos(rot) * outerRadius, this.y + Math.sin(rot) * outerRadius);
+                    rot += step;
+                    ctx.lineTo(this.x + Math.cos(rot) * innerRadius, this.y + Math.sin(rot) * innerRadius);
+                    rot += step;
+                }
+                ctx.lineTo(this.x, this.y - outerRadius);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // 3. Balloon Class
+        class CelebrationBalloon {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 150 + 50;
+                this.radius = Math.random() * 18 + 18;
+                this.color = celebrationColors[Math.floor(Math.random() * celebrationColors.length)];
+                this.speedY = -(Math.random() * 2.5 + 1.5);
+                this.swingSpeed = Math.random() * 0.03 + 0.01;
+                this.swingRange = Math.random() * 14 + 8;
+                this.swingOffset = Math.random() * 100;
+            }
+            update() {
+                this.y += this.speedY;
+                this.swingOffset += this.swingSpeed;
+                this.xOffset = Math.sin(this.swingOffset) * this.swingRange;
+            }
+            draw() {
+                const bx = this.x + this.xOffset;
+                const by = this.y;
+
+                ctx.save();
+                // Draw Balloon string
+                ctx.beginPath();
+                ctx.moveTo(bx, by + this.radius);
+                ctx.bezierCurveTo(bx - 10, by + this.radius + 15, bx + 10, by + this.radius + 30, bx, by + this.radius + 50);
+                ctx.strokeStyle = '#bdc3c7';
+                ctx.lineWidth = 1.8;
+                ctx.stroke();
+
+                // Draw main oval balloon
+                ctx.beginPath();
+                ctx.ellipse(bx, by, this.radius * 0.85, this.radius, 0, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // Draw bottom triangle knot
+                ctx.beginPath();
+                ctx.moveTo(bx, by + this.radius);
+                ctx.lineTo(bx - 6, by + this.radius + 6);
+                ctx.lineTo(bx + 6, by + this.radius + 6);
+                ctx.closePath();
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // Highlight gloss effect
+                ctx.beginPath();
+                ctx.ellipse(bx - this.radius * 0.3, by - this.radius * 0.4, this.radius * 0.2, this.radius * 0.3, Math.PI / 4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        // Loop Runner
+        function drawCelebration() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update & render falling confetti
+            particles = particles.filter(p => p.y < canvas.height + 20 && p.x > -20 && p.x < canvas.width + 20);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // Update & render exploding stars
+            stars = stars.filter(s => s.alpha > 0);
+            stars.forEach(s => {
+                s.update();
+                s.draw();
+            });
+
+            // Update & render rising balloons
+            balloons = balloons.filter(b => b.y > -100);
+            balloons.forEach(b => {
+                b.update();
+                b.draw();
+            });
+
+            if (particles.length > 0 || stars.length > 0 || balloons.length > 0) {
+                animationFrameId = requestAnimationFrame(drawCelebration);
+            } else {
+                animationFrameId = null;
+            }
+        }
+
+        // Trigger Reward & Celebration Engine
+        function triggerCelebration(streak = 0, eventX = null, eventY = null) {
+            // Base reward particles
+            let confettiCount = 45;
+            let starCount = 15;
+            let balloonCount = 8;
+
+            // Increment quantity if streak rises
+            if (streak > 1) {
+                confettiCount += Math.min(streak * 12, 100);
+                starCount += Math.min(streak * 6, 60);
+                balloonCount += Math.min(streak * 2, 20);
+            }
+
+            // Spawn confetti
+            for (let i = 0; i < confettiCount; i++) {
+                particles.push(new ConfettiParticle());
+            }
+
+            // Spawn stars
+            const sx = eventX || window.innerWidth / 2;
+            const sy = eventY || window.innerHeight / 2;
+            for (let i = 0; i < starCount; i++) {
+                stars.push(new StarParticle(sx, sy));
+            }
+
+            // Spawn balloons
+            for (let i = 0; i < balloonCount; i++) {
+                balloons.push(new CelebrationBalloon());
+            }
+
+            // Run rendering loop if inactive
+            if (!animationFrameId) {
+                drawCelebration();
+            }
+
+            // Play Encouraging Mascot reaction
+            triggerMascotReaction();
+        }
+
+        // Cute animated Mascot wiggles and pops speech bubble
+        function triggerMascotReaction() {
+            const mascot = document.getElementById('mascot-container');
+            const bubble = document.getElementById('mascot-bubble');
+            
+            // Random encouraging speech selection
+            const text = successPhrases[Math.floor(Math.random() * successPhrases.length)];
+            bubble.textContent = text;
+            
+            // Bring mascot onto viewport
+            mascot.classList.add('active');
+            setTimeout(() => {
+                bubble.classList.add('active');
+            }, 250);
+
+            // Animate out nicely after 3.2 seconds
+            setTimeout(() => {
+                bubble.classList.remove('active');
+                setTimeout(() => {
+                    mascot.classList.remove('active');
+                }, 300);
+            }, 3200);
+        }
+
+        // Consecutive Win Badge Evaluator
+        function checkAndAwardBadges(streak) {
+            let badgeTitle = '';
+            let badgeDesc = '';
+
+            if (streak === 3) {
+                badgeTitle = "Amazing Explorer";
+                badgeDesc = "Tremendous! You got 3 correct answers in a row!";
+            } else if (streak === 6) {
+                badgeTitle = "Super Learner";
+                badgeDesc = "Stunning! You scored 6 correct answers in a row! You're brilliant!";
+            } else if (streak === 10) {
+                badgeTitle = "Alphabet Star";
+                badgeDesc = "Incredible! 10 correct answers in a row! You are the Alphabet Star!";
+            }
+
+            if (badgeTitle !== '') {
+                // Set Badge text details
+                document.getElementById('badge-title').textContent = badgeTitle;
+                document.getElementById('badge-desc').textContent = badgeDesc;
+
+                // Special chord sounds and voice award
+                playSynthSound('badge_fanfare');
+                speakWord(`Great work! You unlocked the ${badgeTitle} badge!`);
+
+                // Spawn massive celebration burst
+                triggerCelebration(streak + 10, window.innerWidth / 2, window.innerHeight / 2);
+
+                // Show modal overlay
+                document.getElementById('badge-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeBadgeModal() {
+            document.getElementById('badge-modal').classList.add('hidden');
+            playSynthSound('pop');
+        }
+
+
+        // MATCH THE LETTER GAME ENGINE
+        function initMatchGame() {
+            // Pick a random index
+            const randIndex = Math.floor(Math.random() * 26);
+            const item = alphabetDB[randIndex];
+            matchTargetLetter = item.letter;
+
+            // Pick a random category to ask for
+            const categories = ['animal', 'fruit', 'vegetable', 'object'];
+            const randCategory = categories[Math.floor(Math.random() * categories.length)];
+            matchCorrectObject = item[randCategory];
+
+            // Setup prompt visuals
+            document.getElementById('match-target-emoji').textContent = matchCorrectObject.emoji;
+            document.getElementById('match-target-word').textContent = matchCorrectObject.name;
+            document.getElementById('match-feedback').innerHTML = `Tap the correct letter card!`;
+            document.getElementById('match-feedback').className = "mt-6 p-3 rounded-2xl bg-slate-50 border border-slate-200 text-lg font-bold text-slate-500 min-h-[50px] flex items-center justify-center text-center";
+
+            // Generate Options (1 correct, 2 distractors)
+            const distractors = [];
+            while(distractors.length < 2) {
+                const rIndex = Math.floor(Math.random() * 26);
+                const l = alphabetDB[rIndex].letter;
+                if(l !== matchTargetLetter && !distractors.includes(l)) {
+                    distractors.push(l);
+                }
+            }
+
+            const options = [matchTargetLetter, ...distractors];
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            // Render option buttons
+            const optionsContainer = document.getElementById('match-options');
+            optionsContainer.innerHTML = '';
+
+            const colors = ['bg-brandOrange border-orange-700', 'bg-brandGreen border-green-700', 'bg-brandBlue border-blue-700'];
+
+            options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `bubbly-btn text-4xl font-black text-white p-5 rounded-2xl border-b-8 ${colors[idx % colors.length]} flex flex-col items-center justify-center transition-all hover:brightness-110`;
+                btn.innerHTML = `${opt}<span class="text-xs font-bold opacity-80">${opt.toLowerCase()}</span>`;
+                
+                btn.onclick = (e) => handleMatchSelection(opt, e.clientX, e.clientY);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Prompt speech
+            speakWord(`What starting letter matches the word: ${matchCorrectObject.name}?`);
+        }
+
+        function speakMatchPrompt() {
+            if (matchCorrectObject) {
+                speakWord(matchCorrectObject.name);
+            }
+        }
+
+        function handleMatchSelection(selectedLetter, x, y) {
+            const feedbackBox = document.getElementById('match-feedback');
+            if (selectedLetter === matchTargetLetter) {
+                // Correct match!
+                matchScore += 10;
+                matchStreak += 1;
+                document.getElementById('match-score').textContent = matchScore;
+                document.getElementById('match-streak').textContent = `🔥 ${matchStreak}`;
+
+                feedbackBox.innerHTML = `🎉 Amazing! <b>${matchTargetLetter}</b> is for <b>${matchCorrectObject.name}</b>!`;
+                feedbackBox.className = "mt-6 p-3 rounded-2xl bg-green-50 border-2 border-brandGreen text-brandGreen text-lg font-bold min-h-[50px] flex items-center justify-center text-center";
+
+                // Audio reward
+                playSynthSound('success');
+                createExplosion(x, y, '#2ecc71');
+                speakWord(`Great job! ${matchTargetLetter} is for ${matchCorrectObject.name}!`);
+
+                // POSITIVE REWARD CELEBRATIONS TRIGGER
+                triggerCelebration(matchStreak, x, y);
+                checkAndAwardBadges(matchStreak);
+
+                // Auto-advance next round after 3 seconds (gives 3s of celebration time)
+                setTimeout(initMatchGame, 3000);
+            } else {
+                // Wrong choice
+                matchStreak = 0;
+                document.getElementById('match-streak').textContent = `🔥 0`;
+
+                feedbackBox.innerHTML = `❌ Oops! Try again! That letter starts another word.`;
+                feedbackBox.className = "mt-6 p-3 rounded-2xl bg-red-50 border-2 border-brandRed text-brandRed text-lg font-bold min-h-[50px] flex items-center justify-center text-center";
+                
+                playSynthSound('fail');
+                speakWord("Try again! You can do it!");
+            }
+        }
+
+        // LISTEN AND TAP GAME ENGINE
+        function initListenGame() {
+            // Pick a random index
+            const randIndex = Math.floor(Math.random() * 26);
+            listenTargetLetter = alphabetDB[randIndex].letter;
+
+            document.getElementById('listen-feedback').innerHTML = `Tap the blue horn to listen to the letter!`;
+            document.getElementById('listen-feedback').className = "p-3 rounded-2xl bg-slate-50 border border-slate-200 text-lg font-bold text-slate-500 min-h-[50px] flex items-center justify-center text-center";
+
+            // Options (1 correct, 3 distractors)
+            const distractors = [];
+            while(distractors.length < 3) {
+                const rIndex = Math.floor(Math.random() * 26);
+                const l = alphabetDB[rIndex].letter;
+                if(l !== listenTargetLetter && !distractors.includes(l)) {
+                    distractors.push(l);
+                }
+            }
+
+            const options = [listenTargetLetter, ...distractors];
+            options.sort(() => Math.random() - 0.5);
+
+            // Render Options
+            const optionsContainer = document.getElementById('listen-options');
+            optionsContainer.innerHTML = '';
+
+            const colors = [
+                'bg-brandOrange border-orange-700', 
+                'bg-brandGreen border-green-700', 
+                'bg-brandPurple border-purple-700', 
+                'bg-brandBlue border-blue-700'
+            ];
+
+            options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `bubbly-btn text-3xl font-black text-white p-4 rounded-2xl border-b-8 ${colors[idx % colors.length]} flex flex-col items-center justify-center transition-all hover:brightness-110`;
+                btn.innerHTML = `${opt}<span class="text-xs font-bold opacity-80">${opt.toLowerCase()}</span>`;
+                
+                btn.onclick = (e) => handleListenSelection(opt, e.clientX, e.clientY);
+                optionsContainer.appendChild(btn);
+            });
+
+            speakListenPrompt();
+        }
+
+        function speakListenPrompt() {
+            speakWord(`Can you find the letter: ${listenTargetLetter}?`, 1.2, 0.7);
+        }
+
+        function handleListenSelection(selectedLetter, x, y) {
+            const feedbackBox = document.getElementById('listen-feedback');
+            if (selectedLetter === listenTargetLetter) {
+                listenScore += 10;
+                listenStreak += 1;
+                document.getElementById('listen-score').textContent = listenScore;
+
+                feedbackBox.innerHTML = `🌟 Hurrah! You found the letter <b>${listenTargetLetter}</b>!`;
+                feedbackBox.className = "p-3 rounded-2xl bg-green-50 border-2 border-brandGreen text-brandGreen text-lg font-bold min-h-[50px] flex items-center justify-center text-center";
+
+                // Audio reward
+                playSynthSound('success');
+                createExplosion(x, y, '#3498db');
+                speakWord(`Splendid! That is the letter ${listenTargetLetter}!`);
+
+                // POSITIVE REWARD CELEBRATIONS TRIGGER
+                triggerCelebration(listenStreak, x, y);
+                checkAndAwardBadges(listenStreak);
+
+                // Auto-advance next round after 3 seconds
+                setTimeout(initListenGame, 3000);
+            } else {
+                listenStreak = 0;
+                feedbackBox.innerHTML = `❌ No, that's letter ${selectedLetter}. Tap the blue horn to hear again!`;
+                feedbackBox.className = "p-3 rounded-2xl bg-red-50 border-2 border-brandRed text-brandRed text-lg font-bold min-h-[50px] flex items-center justify-center text-center";
+                
+                playSynthSound('fail');
+                speakWord(`No, that is ${selectedLetter}. Hear again!`);
+            }
+        }
+
+        // Initializer on load
+        window.onload = function() {
+            initDecorativeBubbles();
+            // Start default voice trigger on user click engagement
+            document.body.addEventListener('click', () => {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }, { once: true });
+        };
+    </script>
+</body>
+</html>
